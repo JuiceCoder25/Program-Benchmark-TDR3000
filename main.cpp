@@ -3,106 +3,114 @@
 #include <chrono>
 #include <random>
 #include <string>
-#include <algorithm> // untuk std::sort bawaan (membantu membuat skenario)
-
-// Include file algoritma kalian
+#include <algorithm>
+#include <iomanip>
+#include <cstdlib>
 #include "bubble.h"
-// #include "selection.h"  // Uncomment jika file temanmu sudah ada
-// #include "quick.h"      // Uncomment jika file temanmu sudah ada
+//#include "counting.h"
+//#include "quick.h"
 
-using std::cout;
-using std::cin;
-using std::vector;
-using std::string;
+using namespace std;
+using namespace std::chrono;
 
-// --- FUNGSI BENCHMARK ---
-void runBenchmark(const string& namaAlgoritma, void (*fungsiSort)(vector<int>&), vector<int> data) {
-    cout << ">> Menjalankan " << namaAlgoritma << "... ";
-    
-    auto start = std::chrono::high_resolution_clock::now();
-    fungsiSort(data); 
-    auto end = std::chrono::high_resolution_clock::now();
-    
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    cout << "Selesai! Waktu: " << duration.count() << " ms\n";
+void clearScreen() {
+    #ifdef _WIN32
+        system("cls"); 
+    #else
+        system("clear"); 
+    #endif 
 }
 
-// --- FUNGSI GENERATOR DATA ---
-vector<int> generateData(size_t n, int pilihanKondisi) {
+void printDataPreview(const vector<int>& data, const string& judul) {
+    cout << judul << " :\n[ ";
+    size_t limit = min(data.size(), static_cast<size_t>(20));
+    
+    for (size_t i = 0; i < limit; i++) {
+        cout << data[i];
+        if (i < limit - 1) cout << ", ";
+    }
+    
+    if (data.size() > limit) {
+        cout << " ... (dan " << data.size() - limit << " angka lainnya)";
+    }
+    cout << " ]\n";
+}
+
+long long runBenchmark(const string& namaAlgoritma, void (*fungsiSort)(vector<int>&), vector<int> data) {
+    cout << "\n======================================================\n";
+    cout << "  PENGUJIAN " << namaAlgoritma << "\n";
+    cout << "======================================================\n";
+    
+    printDataPreview(data, ">> Data Sebelum Di-sort");
+    
+    auto start = high_resolution_clock::now();
+    fungsiSort(data); 
+    auto end = high_resolution_clock::now();
+    
+    auto duration = duration_cast<microseconds>(end - start); 
+    
+    cout << "\n";
+    printDataPreview(data, ">> Data Setelah Di-sort");
+    
+    cout << "------------------------------------------------------\n";
+    cout << "=> Waktu Eksekusi " << namaAlgoritma << " : " << duration.count() << " us\n";
+    cout << "------------------------------------------------------\n";
+    
+    return duration.count();
+}
+
+vector<int> generateRandomData(size_t n) {
     vector<int> data(n);
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(1, 100000);
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<int> dist(1, 100000);
 
-    // 1. Isi dengan data acak dulu
-    for (size_t i = 0; i < n; i++) {
-        data[i] = dist(gen);
-    }
-
-    // 2. Ubah sesuai kondisi yang dipilih user
-    if (pilihanKondisi == 2) {
-        // Kondisi Best Case: Data sudah urut dari kecil ke besar
-        std::sort(data.begin(), data.end());
-    } else if (pilihanKondisi == 3) {
-        // Kondisi Worst Case: Data urut terbalik (besar ke kecil)
-        std::sort(data.begin(), data.end(), std::greater<int>());
-    }
+    for (size_t i = 0; i < n; i++) data[i] = dist(gen);
     
     return data;
 }
 
-// --- PROGRAM UTAMA ---
 int main() {
     int input_n;
-    int pilihanKondisi;
 
-    cout << "==========================================\n";
-    cout << "  BENCHMARK ALGORITMA SORTING KELOMPOK X  \n";
-    cout << "==========================================\n\n";
+    clearScreen();
 
-    // 1. Tentukan Jumlah Data
-    cout << "Masukkan jumlah data yang ingin diuji (misal: 10000): ";
-    if (!(cin >> input_n) || input_n <= 0) {
-        cout << "Error: Input harus angka positif!\n";
-        return 1;
-    }
+    cout << "======================================================\n";
+    cout << "                  BENCHMARK SORTING                   \n";
+    cout << "======================================================\n\n";
+
+    cout << "Masukkan jumlah data yang ingin di uji : ";
+    if (!(cin >> input_n) || input_n <= 0) return 1;
     size_t n = static_cast<size_t>(input_n);
 
-    // 2. Pilih Kondisi Data (Ini yang bikin presentasi kalian keren)
-    cout << "\nPilih kondisi awal data:\n";
-    cout << "1. Data Acak (Random)\n";
-    cout << "2. Data Sudah Terurut (Best Case)\n";
-    cout << "3. Data Terurut Terbalik (Worst Case)\n";
-    cout << "Pilihan (1/2/3): ";
-    cin >> pilihanKondisi;
+    cout << "\n[*] Mempersiapkan " << n << " data acak...\n";
+    vector<int> dataUtama = generateRandomData(n);
+    cout << "[*] Data siap! Memulai pengujian satu per satu...\n";
 
-    if (pilihanKondisi < 1 || pilihanKondisi > 3) {
-        cout << "Pilihan tidak valid, otomatis menggunakan Data Acak.\n";
-        pilihanKondisi = 1;
+    // PENGUJIAN SATU PER SATU
+    long long tBubble   = runBenchmark("BUBBLE SORT", sortBubble, dataUtama);
+    //long long tCounting = runBenchmark("COUNTING SORT", sortCounting, dataUtama);
+    //long long tQuick    = runBenchmark("QUICK SORT", sortQuick, dataUtama);
+
+    cout << "\n======================================================\n";
+    cout << "                     KESIMPULAN                       \n";
+    cout << "======================================================\n";
+
+    vector<pair<long long, string>> hasil = {
+        {tBubble, "BUBBLE SORT"},
+        //{tCounting, "COUNTING SORT"},
+        //{tQuick, "QUICK SORT"}
+    };
+
+    sort(hasil.begin(), hasil.end());
+
+    cout << "RANK | ALGORITMA       | WAKTU EKSEKUSI\n";
+    cout << "------------------------------------------------------\n";
+    for (int i = 0; i < hasil.size(); i++) {
+        cout << (i + 1) << "    | " << left << setw(15) << hasil[i].second 
+             << " | " << hasil[i].first << " us" << endl;
     }
+    cout << "======================================================\n\n";
 
-    cout << "\n[ Mempersiapkan " << n << " data... ]\n";
-    vector<int> dataUtama = generateData(n, pilihanKondisi);
-    cout << "[ Data siap! Memulai Benchmark... ]\n\n";
-
-    // 3. Panggil dan uji semua algoritma dengan data yang sama
-    cout << "--- HASIL UJI KECEPATAN ---\n";
-    
-    // Bubble Sort (Pekerjaanmu)
-    //runBenchmark("Bubble Sort   ", sortBubble, dataUtama);
-    
-    /* 
-    // SELECTION SORT (Pekerjaan Temanmu)
-    // Uncomment baris di bawah jika function selection sort sudah di-include
-    // runBenchmark("Selection Sort", sortSelection, dataUtama);
-    
-    // QUICK SORT (Pekerjaan Temanmu)
-    // Uncomment baris di bawah jika function quick sort sudah di-include
-    // runBenchmark("Quick Sort    ", sortQuick, dataUtama);
-    */
-
-    cout << "\n==========================================\n";
-    cout << "Pengujian Selesai!\n";
-    
     return 0;
 }
