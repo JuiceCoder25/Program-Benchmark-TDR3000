@@ -7,8 +7,8 @@
 #include <iomanip>
 #include <cstdlib>
 #include "bubble.h"
-//#include "counting.h"
 #include "quick.h"
+#include "counting.h"
 
 using namespace std;
 using namespace std::chrono;
@@ -89,9 +89,8 @@ int main() {
 
     // PENGUJIAN SATU PER SATU
     long long tBubble   = runBenchmark("BUBBLE SORT", sortBubble, dataUtama);
-    //long long tCounting = runBenchmark("COUNTING SORT", sortCounting, dataUtama);
     long long tQuick    = runBenchmark("QUICK SORT", sortQuick, dataUtama);
-    //long long tQuick    = runBenchmark("QUICK SORT", sortQuick, dataUtama);
+    long long tCounting = runBenchmark("COUNTING SORT", sortCounting, dataUtama);
 
     cout << "\n======================================================\n";
     cout << "                     KESIMPULAN                       \n";
@@ -99,9 +98,8 @@ int main() {
 
     vector<pair<long long, string>> hasil = {
         {tBubble, "BUBBLE SORT"},
-        //{tCounting, "COUNTING SORT"},
-        {tQuick, "QUICK SORT"}
-        //{tQuick, "QUICK SORT"}
+        {tQuick, "QUICK SORT"},
+        {tCounting, "COUNTING SORT"},
     };
 
     sort(hasil.begin(), hasil.end());
