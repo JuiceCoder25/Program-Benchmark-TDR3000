@@ -7,7 +7,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include "bubble.h"
-//#include "counting.h"
+#include "counting.h"
 //#include "quick.h"
 
 using namespace std;
@@ -89,7 +89,7 @@ int main() {
 
     // PENGUJIAN SATU PER SATU
     long long tBubble   = runBenchmark("BUBBLE SORT", sortBubble, dataUtama);
-    //long long tCounting = runBenchmark("COUNTING SORT", sortCounting, dataUtama);
+    long long tCounting = runBenchmark("COUNTING SORT", sortCounting, dataUtama);
     //long long tQuick    = runBenchmark("QUICK SORT", sortQuick, dataUtama);
 
     cout << "\n======================================================\n";
@@ -98,7 +98,7 @@ int main() {
 
     vector<pair<long long, string>> hasil = {
         {tBubble, "BUBBLE SORT"},
-        //{tCounting, "COUNTING SORT"},
+        {tCounting, "COUNTING SORT"},
         //{tQuick, "QUICK SORT"}
     };
 
