@@ -91,6 +91,7 @@ int main() {
     long long tBubble   = runBenchmark("BUBBLE SORT", sortBubble, dataUtama);
     //long long tCounting = runBenchmark("COUNTING SORT", sortCounting, dataUtama);
     long long tQuick    = runBenchmark("QUICK SORT", sortQuick, dataUtama);
+    //long long tQuick    = runBenchmark("QUICK SORT", sortQuick, dataUtama);
 
     cout << "\n======================================================\n";
     cout << "                     KESIMPULAN                       \n";
@@ -100,6 +101,7 @@ int main() {
         {tBubble, "BUBBLE SORT"},
         //{tCounting, "COUNTING SORT"},
         {tQuick, "QUICK SORT"}
+        //{tQuick, "QUICK SORT"}
     };
 
     sort(hasil.begin(), hasil.end());
